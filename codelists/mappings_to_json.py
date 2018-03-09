@@ -1,5 +1,6 @@
 from lxml import etree as ET
 import os, json
+import sys
 
 def mapping_to_json(mappings):
     for mapping in mappings.getroot().xpath('//mapping'):
@@ -11,7 +12,6 @@ def mapping_to_json(mappings):
             out['condition'] = mapping.find('condition').text
         yield out
 
-mappings = ET.parse('mapping.xml')
-with open('mapping.json', 'w') as fp:
-    json.dump(list(mapping_to_json(mappings)), fp)
+mappings = ET.parse(sys.argv[1])
+json.dump(list(mapping_to_json(mappings)), sys.stdout)
 
