@@ -4,15 +4,16 @@ from lxml.builder import E
 from gen import languages
 from collections import OrderedDict
 import os
+import sys
 import datetime, pytz
 import json, csv
 
 language = 'en'
 
-OUTPUTDIR = os.path.join('out','clv1')
+OUTPUTDIR = sys.argv[1]
 
 try:
-    os.makedirs(os.path.join(OUTPUTDIR,'codelist'))
+    os.makedirs(os.path.join(OUTPUTDIR, 'clv1', 'codelist'))
 except OSError: pass
 
 def utf8_encode_dict(d):
@@ -24,8 +25,8 @@ def utf8_encode_dict(d):
 old_codelist_index = E.codelists()
 old_codelist_index_json_list = []
 
-for fname in os.listdir(os.path.join('out','clv2','xml')):
-    codelist = ET.parse(os.path.join('out','clv2','xml',fname))
+for fname in os.listdir(os.path.join(OUTPUTDIR,'clv2','xml')):
+    codelist = ET.parse(os.path.join(OUTPUTDIR,'clv2','xml',fname))
     attrib = codelist.getroot().attrib
 
 
@@ -84,7 +85,7 @@ for fname in os.listdir(os.path.join('out','clv2','xml')):
             old_codelist_json_item['category'] = category.text
 
             try:
-                category_item = ET.parse(os.path.join('out','clv2','xml',attrib['category-codelist']+'.xml')).xpath('//codelist-item[code="{0}"]'.format(category.text))[0]
+                category_item = ET.parse(os.path.join(OUTPUTDIR,'clv2','xml',attrib['category-codelist']+'.xml')).xpath('//codelist-item[code="{0}"]'.format(category.text))[0]
                 category_name = category_item.xpath('name[not(xml:lang) or xml:lang="en"]')[0].text
             except (IndexError, KeyError):
                 category_item = None
@@ -103,18 +104,18 @@ for fname in os.listdir(os.path.join('out','clv2','xml')):
         old_codelist_json_list.append(old_codelist_json_item)
 
 
-    with open(os.path.join(OUTPUTDIR,'codelist',attrib['name']+'.csv'), 'w') as fp:
+    with open(os.path.join(OUTPUTDIR, 'clv1', 'codelist',attrib['name']+'.csv'), 'w') as fp:
         dictwriter = csv.DictWriter(fp, ['code','name','description','language','category','category-name','category-description'])
         dictwriter.writeheader()
         for line in old_codelist_json_list:
             dictwriter.writerow(utf8_encode_dict(line))
 
-    ET.ElementTree(old_codelist).write(os.path.join(OUTPUTDIR,'codelist',fname), pretty_print=True)
-    with open(os.path.join(OUTPUTDIR,'codelist',attrib['name']+'.json'), 'w') as fp:
+    ET.ElementTree(old_codelist).write(os.path.join(OUTPUTDIR, 'clv1', 'codelist',fname), pretty_print=True)
+    with open(os.path.join(OUTPUTDIR, 'clv1', 'codelist',attrib['name']+'.json'), 'w') as fp:
         old_codelist_json[attrib['name']] = old_codelist_json_list
         json.dump(old_codelist_json, fp)
 
-ET.ElementTree(old_codelist_index).write(os.path.join(OUTPUTDIR, 'codelist.xml'), pretty_print=True)
-with open(os.path.join(OUTPUTDIR,'codelist.json'), 'w') as fp:
+ET.ElementTree(old_codelist_index).write(os.path.join(OUTPUTDIR, 'clv1', 'codelist.xml'), pretty_print=True)
+with open(os.path.join(OUTPUTDIR, 'clv1', 'codelist.json'), 'w') as fp:
     json.dump({'codelist':old_codelist_index_json_list}, fp)
 
