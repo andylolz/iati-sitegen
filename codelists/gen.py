@@ -1,5 +1,6 @@
 from lxml import etree as ET
 import os, re
+import sys
 import csv, json
 from functools import partial
 
@@ -7,7 +8,7 @@ languages = ['en','fr']
 
 xml_lang = '{http://www.w3.org/XML/1998/namespace}lang'
 
-OUTPUTDIR = os.path.join('out','clv2')
+OUTPUTDIR = os.path.join(sys.argv[1], 'clv2')
 
 def normalize_whitespace(x):
     if x is None:
@@ -37,8 +38,8 @@ for language in languages:
         os.makedirs(os.path.join(OUTPUTDIR,'csv',language))
     except OSError: pass
 
-    for fname in os.listdir(os.path.join('out','clv2','xml')):
-        codelist = ET.parse(os.path.join('out','clv2','xml',fname))
+    for fname in os.listdir(os.path.join(OUTPUTDIR, 'xml')):
+        codelist = ET.parse(os.path.join(OUTPUTDIR, 'xml',fname))
         attrib = codelist.getroot().attrib
         assert attrib['name'] == fname.replace('.xml','')
 
