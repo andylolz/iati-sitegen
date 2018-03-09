@@ -41,7 +41,7 @@ python $SCRIPT_PATH/mappings_to_json.py $BUILD_PATH/IATI-Codelists/mapping.xml >
 cp $BUILD_PATH/IATI-Codelists/mapping.xml $OUTPUT_PATH/clv1/
 cp $BUILD_PATH/IATI-Codelists/mapping.xml $OUTPUT_PATH/clv2/
 
-if [ "${1:0:9}" == "version-2" ]; then
+if [ "${1:0:9}" != "version-1" ]; then
     cp $OUTPUT_PATH/clv2/mapping.{xml,json} $OUTPUT_PATH/clv3/
     cp -r $OUTPUT_PATH/clv2/{codelists.json,codelists.xml,csv,json} $OUTPUT_PATH/clv3/
 fi
